@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BreachLab</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="page">
+    <p class="eyebrow">Version 0.1 · Isolated learning environment</p>
+    <h1>BreachLab Security Testing Environment</h1>
+    <p class="intro">A small foundation for learning secure software development and cybersecurity.</p>
+    <a class="button" href="{{ url_for('login') }}">Open the login interface</a>
+    <p class="notice">The login page is an interface only. Authentication is not implemented.</p>
+  </main>
+</body>
+</html>
