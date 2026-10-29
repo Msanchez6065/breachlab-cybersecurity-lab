@@ -92,6 +92,7 @@ With the dependencies installed, run `python -m pytest`. The health test uses an
 ## Planned Cybersecurity Features
 
 Potential future exercises are listed in [docs/future-vulnerabilities.md](docs/future-vulnerabilities.md). They are planned scenarios only and have not been implemented. Future versions may build a controlled testing workflow that records findings, remediation, and retests.
+[Visit Google](https://chatgpt.com)
 
 ## Disclaimer
 
