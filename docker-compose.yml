@@ -22,7 +22,7 @@ services:
       DB_HOST: db
       DB_PORT: 5432
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
     depends_on:
       db:
         condition: service_healthy
