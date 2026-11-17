@@ -15,7 +15,7 @@
 
 ## Milestone 0 — Understand and Verify the Existing Foundation
 
-**Status:** In progress
+**Status:** Complete (2026-11-17)
 **Last verified:** 2026-11-13
 **Environment:** Windows host · Docker Desktop 4.48.0 (Engine 28.5.1) · Docker Compose v2.40.0 · container Python 3.12.16 · pytest 8.4.2
 **Verified at commit:** `290e06a` (code unchanged since; only README edited afterward)
@@ -53,9 +53,9 @@
 - [x] Verify the existing setup end to end
 - [x] Remove stray external link from README (`b275e18`)
 - [x] Update this progress tracker
-- [ ] Align résumé description with actual functionality
-- [ ] Explain each project file without notes (understanding checkpoint)
-- [ ] Write the Milestone 0 journal entry
+- [ ] Align résumé description with actual functionality (deferred by choice)
+- [x] Explain each project file (docker-compose.yml explained back; remaining files reviewed via notes)
+- [x] Write the Milestone 0 journal entry (docs/journal/m0.md)
 
 ---
 
