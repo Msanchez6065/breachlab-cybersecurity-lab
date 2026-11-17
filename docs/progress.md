@@ -59,13 +59,50 @@
 
 ---
 
+## Milestone 1 — Lab Networking and Isolation
+
+**Status:** Complete (2026-11-17)
+**Branch:** `m1-network-isolation`
+
+### Changes
+
+- Web port published on localhost only: `127.0.0.1:5000:5000` (remediates OBS-01)
+- Two Docker networks: `frontend` (web, attacker) and `backend` (web, db), with `backend` marked `internal: true`
+- New `attacker` service (`attacker/Dockerfile`): Python 3.12 slim image with nmap, curl, ping, and dnsutils, attached to `frontend` only
+
+### Verification Results
+
+| Item | Status | Evidence / Notes |
+|---|---|---|
+| Web published on localhost only | Verified (manual) | `docker compose ps`: only `127.0.0.1:5000->5000/tcp` |
+| App reachable from the host | Verified (manual) | `curl.exe -i http://localhost:5000/health`: 200 |
+| Web reaches PostgreSQL over `backend` | Verified (manual) | `/health` reports `"database":"connected"` |
+| Data persists across `down` / `up` | Verified (manual) | Seed reported "Added 0" after containers and networks were recreated |
+| `backend` membership | Verified (manual) | `docker network inspect`: web, db |
+| `frontend` membership | Verified (manual) | `docker network inspect`: web only (checked before the attacker was added) |
+| Attacker reaches web by name | Verified (manual) | From attacker: `curl -i http://web:5000/health` returned 200 |
+| Attacker cannot resolve `db` | Verified (manual) | From attacker: `nslookup db` returned SERVFAIL |
+| Attacker cannot reach PostgreSQL by IP | Verified (manual) | From attacker: `nmap -Pn -p 5432 172.19.0.2` reported `filtered` |
+| Scanner control test | Verified (manual) | From attacker: `nmap -Pn -p 5000 web` reported `open`, confirming the `filtered` result is meaningful |
+| `db` has no internet access | Verified (manual) | From db: `ping -c 2 -W 2 8.8.8.8` returned "Network unreachable" |
+| Attacker internet access | Not verified | Expected, since `frontend` is not internal; not tested |
+| Automated segmentation tests | Planned | To be added with the M3 CLI |
+
+### Notes
+
+- `docker compose down` only removes networks defined in the current file. The orphaned v0.1 `default` network was removed manually.
+- With `-Pn`, nmap's "Host is up" reflects the flag's assumption, not confirmed reachability.
+- nmap labels port 5000 as `upnp` based on the port number alone; the service is actually Flask.
+
+---
+
 ## Security Observations
 
 These are observations about the lab infrastructure, not intentionally planted vulnerabilities. Severity reflects **current** risk.
 
 | ID | Observation | Severity | Status | Planned Fix |
 |---|---|---|---|---|
-| OBS-01 | Web port published on all host interfaces (`0.0.0.0:5000` and `[::]:5000`) | Low | Verified (manual) | M1: bind to `127.0.0.1:5000:5000` |
+| OBS-01 | Web port published on all host interfaces (`0.0.0.0:5000` and `[::]:5000`) | Low | Remediated (retested 2026-11-17) | Fixed in M1: bound to `127.0.0.1:5000:5000` |
 | OBS-02 | `Server` header discloses `Werkzeug/3.1.9 Python/3.12.16` | Informational | Verified (manual) | Later milestone: explicitly control the `Server` header and re-verify |
 
 ### OBS-01 — Web Service Exposed on All Network Interfaces
@@ -75,6 +112,7 @@ These are observations about the lab infrastructure, not intentionally planted v
 - **Severity: Low.** The app currently has no working authentication, no sensitive functionality, and only fake data, so an attacker on the local network would gain very little.
 - **Risk note:** This risk would increase significantly once intentional vulnerabilities are introduced, because anyone able to reach port 5000 could exploit them. For that reason, remediation is scheduled for M1, **before** any vulnerabilities are added. The severity will be reassessed if the issue is still present at that point.
 - **Remediation:** Publish the port as `127.0.0.1:5000:5000`, then confirm with `docker compose ps` that only `127.0.0.1` is listed.
+- **Retest (2026-11-17):** `docker compose ps` shows only `127.0.0.1:5000->5000/tcp`; the `0.0.0.0` and `[::]` bindings are gone, and the app remains reachable from the host. **Status: Remediated.**
 
 ### OBS-02 — Server Version Disclosure
 
@@ -89,7 +127,7 @@ These are observations about the lab infrastructure, not intentionally planted v
 
 | Milestone | Description | Status |
 |---|---|---|
-| M1 | Lab networking and isolation (attacker container, two networks, localhost binding) | Planned |
+| M1 | Lab networking and isolation (attacker container, two networks, localhost binding) | Complete (2026-11-17) |
 | M2 | Functional authentication and authorization | Planned |
 | M3 | Python CLI, reconnaissance, and enumeration (with scope enforcement) | Planned |
 | M4 | Information exposure and weak authentication | Planned |
