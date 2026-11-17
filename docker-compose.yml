@@ -12,6 +12,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - backend
 
   web:
     build: .
@@ -26,6 +28,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - frontend
+      - backend
 
 volumes:
   postgres_data:
+networks:
+  frontend:
+  backend:
+    internal: true
